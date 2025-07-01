@@ -14,7 +14,7 @@ module API
       error!({ error: "NOT_FOUND", details: [{ fields: %i[resource], errors: ["not found"] }], with: Entities::Error }, 404) if domain != EnvironmentConfig.miniap_core_host
 
       subject = "#{username}@#{EnvironmentConfig.miniap_core_host}"
-      href = "http#{"s" if EnvironmentConfig.use_https?}://#{EnvironmentConfig.miniap_core_host}/api/actor/#{username}"
+      href = "http#{"s" if EnvironmentConfig.use_https?}://#{EnvironmentConfig.miniap_core_host}/api/actors/#{username}"
       { subject:, links: [{ rel: "self", type: "application/activity+json", href: }] }
     end
   end
