@@ -45,6 +45,9 @@ GEM
       async-http (~> 0.56)
     async-pool (0.10.3)
       async (>= 1.25)
+    async-rest (0.19.1)
+      async-http (~> 0.42)
+      protocol-http (~> 0.45)
     async-service (0.13.0)
       async
       async-container (~> 0.16)
@@ -291,6 +294,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  async-rest
   debug
   dotenv
   falcon

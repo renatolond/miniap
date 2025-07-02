@@ -12,6 +12,8 @@ gem "grape-swagger-entity"
 
 gem "falcon" # The app server
 
+gem "async-rest" # Used for making requests towards other servers
+
 group :development, :test do
   gem "dotenv" # Used to load environment variables from .env files
 

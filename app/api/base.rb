@@ -41,9 +41,37 @@ module API
           publicKey: {
             id: "#{base_url}api/actors/#{username}#main-key",
             owner: "#{base_url}api/actors/#{username}",
-            publicKeyPem: "-----BEGIN PUBLIC KEY-----#{publicKey}-----END PUBLIC KEY-----"
+            publicKeyPem: File.read("alice_public.pem")
           }
         }
+      end
+      get ":username/followers" do
+        []
+      end
+      get ":username/following" do
+        []
+      end
+    end
+
+    post :send_hello do
+      base_url = "http#{"s" if EnvironmentConfig.use_https?}://#{EnvironmentConfig.miniap_core_host}/"
+        username = "alice"
+      body = %({"@context": "https://www.w3.org/ns/activitystreams","id": "#{base_url}create-hello-world","type": "Create","actor": "#{base_url}api/actors/#{username}","object": {"id": "#{base_url}hello-world","type": "Note","published": "2025-07-02T11:17:11Z","attributedTo": "#{base_url}api/actors/#{username}","inReplyTo": "http://localhost:3001/@admin/114777388896097652","content": "<p>Hello world</p>","to": "https://www.w3.org/ns/activitystreams#Public"}})
+      pp body
+      keypair = OpenSSL::PKey::RSA.new(File.read("alice_private.pem"))
+      date = Time.now.utc.httpdate
+      body_digest = RequestSigner.body_digest(body)
+      signed_string = RequestSigner.signed_string("post /inbox", "localhost:3001", date, body_digest)
+      signature = RequestSigner.sign(signed_string, keypair)
+      extra_headers = {
+        Signature: %(keyId="#{base_url}api/actors/#{username}",headers="#{RequestSigner::HEADERS}",signature="#{signature}"),
+        Date: date,
+        Digest: body_digest,
+        "Content-type": "application/activity+json"
+      }
+      pp extra_headers
+      ActivityPubClientHandler.connect(host: "http://localhost:3001", extra_headers:) do |client|
+        client.inbox_post(body:)
       end
     end
 
